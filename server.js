@@ -1,10 +1,18 @@
 // require necessary NPM packages
 const express = require('express')
+const app = require('express')()
+const http = require('http').Server(app)
+const io = require('socket.io')(http, {
+  cors: {
+    origin: 'http://localhost:7165',
+    methods: ["GET", "POST"]
+  }
+})
 const mongoose = require('mongoose')
 const cors = require('cors')
 
 // require route files
-const exampleRoutes = require('./app/routes/example_routes')
+const messageRoutes = require('./app/routes/message_routes')
 const userRoutes = require('./app/routes/user_routes')
 
 // require middleware
@@ -32,12 +40,9 @@ mongoose.connect(db, {
   useCreateIndex: true
 })
 
-// instantiate express application object
-const app = express()
-
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
+// app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
 // define port for API to run on
 const port = process.env.PORT || serverDevPort
@@ -61,7 +66,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
-app.use(exampleRoutes)
+app.use(messageRoutes)
 app.use(userRoutes)
 
 // register error handling middleware
@@ -70,8 +75,19 @@ app.use(userRoutes)
 app.use(errorHandler)
 
 // run API on designated port (4741 in this case)
-app.listen(port, () => {
-  console.log('listening on port ' + port)
+// app.listen(port, () => {
+//   console.log('listening on port ' + port)
+// })
+
+
+http.listen(port, () => {
+  console.log('listening')
+})
+
+
+io.on('connection', (socket) => {
+  io.emit('hello', 'can you hear me?', 1, 2, 'abc')
+  socket.on('message', (message) => io.emit('message', message))
 })
 
 // needed for testing
