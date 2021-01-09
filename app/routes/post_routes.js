@@ -4,7 +4,7 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for examples
-const Message = require('../models/message')
+const Post = require('../models/post')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -29,42 +29,42 @@ const router = express.Router()
 
 // INDEX
 // GET /examples
-router.get('/messages', (req, res, next) => {
-  Message.find()
-    .then(messages => {
+router.get('/posts', (req, res, next) => {
+  Post.find()
+    .then(posts => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return messages.map(message => message.toObject())
+      return posts.map(post => post.toObject())
     })
     // respond with status 200 and JSON of the examples
-    .then(messages => res.status(200).json({ messages: messages }))
+    .then(posts => res.status(200).json({ posts: posts }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // SHOW
 // GET /examples/5a7db6c74d55bc51bdf39793
-router.get('/messages/:id', requireToken, (req, res, next) => {
+router.get('/posts/:id', requireToken, (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
-  Message.findById(req.params.id)
+  Post.findById(req.params.id)
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(message => res.status(200).json({ message: message.toObject() }))
+    .then(post => res.status(200).json({ post: post.toObject() }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // CREATE
 // POST /examples
-router.post('/messages', requireToken, (req, res, next) => {
+router.post('/posts', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.message.owner = req.user.id
+  req.body.post.owner = req.user.id
 
-  Message.create(req.body.message)
+  Post.create(req.body.post)
     // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(message => {
-      res.status(201).json({ message: message.toObject() })
+    .then(post => {
+      res.status(201).json({ message: post.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -74,20 +74,20 @@ router.post('/messages', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.message.owner
+  delete req.body.post.owner
 
-  Message.findById(req.params.id)
+  Post.findById(req.params.id)
     .then(handle404)
-    .then(message => {
+    .then(post => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, message)
+      requireOwnership(req, post)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return message.updateOne(req.body.message)
+      return post.updateOne(req.body.post)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -97,14 +97,14 @@ router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/messages/:id', requireToken, (req, res, next) => {
-  Message.findById(req.params.id)
+router.delete('/posts/:id', requireToken, (req, res, next) => {
+  Post.findById(req.params.id)
     .then(handle404)
-    .then(message => {
+    .then(post => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, message)
+      requireOwnership(req, post)
       // delete the example ONLY IF the above didn't throw
-      message.deleteOne()
+      post.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))

@@ -42,7 +42,7 @@ mongoose.connect(db, {
 
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
-// app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
 
 // define port for API to run on
 const port = process.env.PORT || serverDevPort
@@ -83,12 +83,14 @@ app.use(errorHandler)
 http.listen(port, () => {
   console.log('listening')
 })
-
-
+const messageArr = []
 io.on('connection', (socket) => {
-  io.emit('hello', 'can you hear me?', 1, 2, 'abc')
-  socket.on('message', (message) => io.emit('message', message))
-})
+  io.emit('hello', 'Welcome')
+  socket.on('message', ((message) => {
+    messageArr.push(message)
+    console.log(messageArr)
+    socket.broadcast.emit('message', messageArr)
+}))})
 
 // needed for testing
 module.exports = app
