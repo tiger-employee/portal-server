@@ -80,16 +80,25 @@ app.use(errorHandler)
 // })
 
 
-http.listen(port, () => {
+http.listen(4741, () => {
   console.log('listening')
 })
 const messageArr = []
 io.on('connection', (socket) => {
-  io.emit('hello', 'Welcome')
-  socket.on('message', ((message) => {
+  // is loading when the browser opens, not on sign in.
+  socket.emit('hello', 'Welcome')
+  console.log('new user')
+  socket.broadcast.emit('hello', 'A new user has joined')
+  socket.on('sendMessage', ((message) => {
     messageArr.push(message)
     console.log(messageArr)
-    socket.broadcast.emit('message', messageArr)
+    // should this be io.emit or socket.emit?
+    io.emit('message', messageArr)
+
+    socket.on('disconnect', () => {
+      io.emit('hello', 'A user has left')
+      console.log('user left')
+    })
 }))})
 
 // needed for testing
