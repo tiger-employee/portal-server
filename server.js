@@ -93,7 +93,7 @@ io.on('connection', (socket) => {
     messageArr.push(message)
     console.log(messageArr)
     // should this be io.emit or socket.emit?
-    io.emit('message', messageArr)
+    socket.broadcast.emit('message', messageArr)
 
     socket.on('disconnect', () => {
       io.emit('hello', 'A user has left')
