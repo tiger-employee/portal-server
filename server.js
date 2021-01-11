@@ -87,7 +87,7 @@ const messageArr = []
 io.on('connection', (socket) => {
   // is loading when the browser opens, not on sign in.
   socket.emit('hello', 'Welcome')
-  console.log('new user')
+  console.log(socket.client.id, 'entered')
   socket.broadcast.emit('hello', 'A new user has joined')
   socket.on('sendMessage', ((message) => {
     messageArr.push(message)
