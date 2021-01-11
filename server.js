@@ -86,14 +86,14 @@ http.listen(4741, () => {
 const messageArr = []
 io.on('connection', (socket) => {
   // is loading when the browser opens, not on sign in.
-  socket.emit('hello', 'Welcome')
+  socket.emit('newConnection', 'Welcome')
   console.log(socket.client.id, 'entered')
-  socket.broadcast.emit('hello', 'A new user has joined')
+  socket.broadcast.emit('newConnection', 'A new user has joined')
   socket.on('sendMessage', ((message) => {
     messageArr.push(message)
     console.log(messageArr)
     // should this be io.emit or socket.emit?
-    socket.broadcast.emit('message', messageArr)
+    socket.broadcast.emit('message', message)
 
     socket.on('disconnect', () => {
       io.emit('hello', 'A user has left')
