@@ -29,7 +29,7 @@ const auth = require('./lib/auth')
 
 // define server and client ports
 // used for cors and local port declaration
-const serverDevPort = 4741
+const serverDevPort = 3000
 const clientDevPort = 7165
 
 // establish database connection
@@ -80,13 +80,18 @@ app.use(errorHandler)
 // })
 
 
-http.listen(4741, () => {
+http.listen(3000, () => {
   console.log('listening')
 })
 const messageArr = []
 io.on('connection', (socket) => {
   // is loading when the browser opens, not on sign in.
   socket.emit('newConnection', 'Welcome')
+  
+  socket.on('username', email => {
+    socket.broadcast.emit('email', email)
+  })
+
   console.log(socket.client.id, 'entered')
   socket.broadcast.emit('newConnection', 'A new user has joined')
   socket.on('sendMessage', ((message) => {
