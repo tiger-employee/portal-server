@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // chat: [Chat],
   token: String
 }, {
   timestamps: true,

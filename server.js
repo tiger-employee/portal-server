@@ -83,13 +83,16 @@ app.use(errorHandler)
 http.listen(3000, () => {
   console.log('listening')
 })
-const messageArr = []
+const userArr = []
 io.on('connection', (socket) => {
   // is loading when the browser opens, not on sign in.
   socket.emit('newConnection', 'Welcome')
   
   socket.on('username', email => {
-    socket.broadcast.emit('email', email)
+    userArr.push(email)
+    socket.emit('email', userArr)
+    socket.emit(email)
+    email = ''
   })
 
   console.log(socket.client.id, 'entered')
@@ -100,8 +103,15 @@ io.on('connection', (socket) => {
     // should this be io.emit or socket.emit?
     socket.broadcast.emit('message', message)
 
+    socket.on('disconnectUser', () => {
+      console.log('user')
+    })
+
     socket.on('disconnect', () => {
-      io.emit('hello', 'A user has left')
+      console.log('user left')
+      // let index = userArr.findIndex(email)
+      // userArr.splice(index)
+      io.emit('disconnected')
       console.log('user left')
     })
 }))})
