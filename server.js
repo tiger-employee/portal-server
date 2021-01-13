@@ -26,6 +26,7 @@ const db = require('./config/db')
 
 // require configured passport authentication middleware
 const auth = require('./lib/auth')
+const user = require('./app/models/user')
 
 // define server and client ports
 // used for cors and local port declaration
@@ -89,32 +90,34 @@ io.on('connection', (socket) => {
   socket.emit('newConnection', 'Welcome')
   
   socket.on('username', email => {
-    userArr.push(email)
-    socket.emit('email', userArr)
-    socket.emit(email)
-    email = ''
+    console.log('connect')
+    if (!userArr.some(item => item === email)){
+      userArr.push(email)
+      socket.broadcast.emit('addUserToChat', email)
+      socket.emit('email', userArr)
+    } else {
+      console.log(email, 'already on list')
+    }
+    console.log(userArr)
   })
 
   console.log(socket.client.id, 'entered')
   socket.broadcast.emit('newConnection', 'A new user has joined')
   socket.on('sendMessage', ((message) => {
-    messageArr.push(message)
-    console.log(messageArr)
-    // should this be io.emit or socket.emit?
     socket.broadcast.emit('message', message)
-
-    socket.on('disconnectUser', () => {
-      console.log('user')
+    }))
+    socket.on('disconnectUser', (email) => {
+      console.log(email, 'is leaving')
+      let index = userArr.findIndex(element => element === email)
+      userArr.splice(index, 1)
+      io.emit('disconnectUser', email)
     })
-
+    socket.on('Hi', (message) => console.log(message))
     socket.on('disconnect', () => {
       console.log('user left')
-      // let index = userArr.findIndex(email)
-      // userArr.splice(index)
       io.emit('disconnected')
-      console.log('user left')
     })
-}))})
+})
 
 // needed for testing
 module.exports = app
