@@ -59,7 +59,7 @@ router.get('/meditations/:id', requireToken, (req, res, next) => {
 // POST /examples
 router.post('/meditations', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.message.owner = req.user.id
+  req.body.meditation.owner = req.user.id
 
   Meditation.create(req.body.meditation)
     // respond to succesful `create` with status 201 and JSON of new "example"
