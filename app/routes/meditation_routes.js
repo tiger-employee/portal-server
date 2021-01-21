@@ -29,8 +29,9 @@ const router = express.Router()
 
 // INDEX
 // GET /examples
-router.get('/meditations', (req, res, next) => {
-  Meditation.find()
+router.get('/meditations', requireToken, (req, res, next) => {
+  const userId = req.user._id
+  Meditation.find({owner: userId})
     .then(meditations => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
