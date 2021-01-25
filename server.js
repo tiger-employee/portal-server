@@ -90,7 +90,6 @@ http.listen(3000, () => {
 const userArr = []
 const userObj = {}
 io.on('connection', (socket) => {
-  // is loading when the browser opens, not on sign in.
   socket.emit('newConnection', 'Welcome')
   
   socket.on('username', email => {
@@ -112,7 +111,7 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', ((message) => {
     socket.broadcast.emit('message', message)
     }))
-  socket.on('Hi', (message) => console.log(message))
+
   socket.on('disconnect', () => {
     console.log('user', userObj[socket.id], ' left')
     let index = userArr.findIndex(element => element === userObj[socket.id])
@@ -122,5 +121,4 @@ io.on('connection', (socket) => {
   })
 })
 
-// needed for testing
 module.exports = app
