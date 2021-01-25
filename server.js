@@ -123,7 +123,8 @@ io.on('connection', (socket) => {
     console.log('user', userObj[socket.id], ' left')
     let index = userArr.findIndex(element => element === userObj[socket.id])
     userArr.splice(index, 1)
-    io.emit('disconnected')
+    socket.broadcast.emit('disconnected', userObj[socket.id])
+    delete userObj[socket.id]
   })
 })
 
