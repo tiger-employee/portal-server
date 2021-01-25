@@ -112,12 +112,6 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', ((message) => {
     socket.broadcast.emit('message', message)
     }))
-  // socket.on('disconnectUser', (email) => {
-  //   console.log(email, 'is leaving')
-  //   let index = userArr.findIndex(element => element === email)
-  //   userArr.splice(index, 1)
-  //   io.emit('disconnectUser', email)
-  // })
   socket.on('Hi', (message) => console.log(message))
   socket.on('disconnect', () => {
     console.log('user', userObj[socket.id], ' left')
