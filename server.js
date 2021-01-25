@@ -88,6 +88,7 @@ http.listen(3000, () => {
   console.log('listening')
 })
 const userArr = []
+const userObj = {}
 io.on('connection', (socket) => {
   // is loading when the browser opens, not on sign in.
   socket.emit('newConnection', 'Welcome')
@@ -96,6 +97,7 @@ io.on('connection', (socket) => {
     console.log('connect')
     if (!userArr.some(item => item === email)){
       userArr.push(email)
+      userObj[socket.id] = email
       socket.broadcast.emit('addUserToChat', email)
       socket.emit('email', userArr)
     } else {
@@ -106,20 +108,23 @@ io.on('connection', (socket) => {
 
   console.log(socket.client.id, 'entered')
   socket.broadcast.emit('newConnection', 'A new user has joined')
+
   socket.on('sendMessage', ((message) => {
     socket.broadcast.emit('message', message)
     }))
-    socket.on('disconnectUser', (email) => {
-      console.log(email, 'is leaving')
-      let index = userArr.findIndex(element => element === email)
-      userArr.splice(index, 1)
-      io.emit('disconnectUser', email)
-    })
-    socket.on('Hi', (message) => console.log(message))
-    socket.on('disconnect', () => {
-      console.log('user left')
-      io.emit('disconnected')
-    })
+  // socket.on('disconnectUser', (email) => {
+  //   console.log(email, 'is leaving')
+  //   let index = userArr.findIndex(element => element === email)
+  //   userArr.splice(index, 1)
+  //   io.emit('disconnectUser', email)
+  // })
+  socket.on('Hi', (message) => console.log(message))
+  socket.on('disconnect', () => {
+    console.log('user', userObj[socket.id], ' left')
+    let index = userArr.findIndex(element => element === userObj[socket.id])
+    userArr.splice(index, 1)
+    io.emit('disconnected')
+  })
 })
 
 // needed for testing
