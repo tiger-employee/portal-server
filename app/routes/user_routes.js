@@ -132,6 +132,22 @@ router.patch('/change-password', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+router.patch('/users/:id', requireToken, (req, res, next) => {
+  // if the client attempts to change the `owner` property by including a new
+  // owner, prevent that by deleting that key/value pair
+  User.findById(req.user.id)
+    .then(user => {
+      // pass the `req` object and the Mongoose record to `requireOwnership`
+      // pass the result of Mongoose's `.update` to the next `.then`
+      user['profileImage'] = req.body.profileImage
+      return user.save()
+    })
+    // if that succeeded, return 204 and no JSON
+    .then(() => res.sendStatus(204))
+    // if an error occurs, pass it to the handler
+    .catch(next)
+})
+
 router.delete('/sign-out', requireToken, (req, res, next) => {
   // create a new random token for the user, invalidating the current one
   req.user.token = crypto.randomBytes(16)

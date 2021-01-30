@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
+  profileImage: {
+    type: String
+  },
   firstName: {
     type: String,
     required: true

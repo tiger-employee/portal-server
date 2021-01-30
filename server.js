@@ -8,6 +8,7 @@ const io = require('socket.io')(http, {
     methods: ["GET", "POST"]
   }
 })
+const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const cors = require('cors')
 
@@ -38,7 +39,7 @@ const clientDevPort = 7165
 // establish database connection
 // use new version of URL parser
 // use createIndex instead of deprecated ensureIndex
-mongoose.connect(db, {
+mongoose.connect(db.currentDb, {
   useNewUrlParser: true,
   useCreateIndex: true
 })
@@ -61,9 +62,11 @@ app.use(auth)
 // add `express.json` middleware which will parse JSON requests into
 // JS objects before they reach the route files.
 // The method `.use` sets up middleware for the Express application
-app.use(express.json())
-// this parses requests sent by `$.ajax`, which use a different content type
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json({limit: "25mb"}))
+app.use(express.urlencoded({
+  limit: "25mb",
+  extended: true
+}))
 
 // log each request as it comes in for debugging
 app.use(requestLogger)
