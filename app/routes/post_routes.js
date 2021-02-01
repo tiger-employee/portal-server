@@ -59,7 +59,8 @@ router.get('/posts/:id', requireToken, (req, res, next) => {
 // POST /examples
 router.post('/posts', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.post.owner = req.user.id
+  console.log(req.user)
+  req.body.post.owner = req.user._id
 
   Post.create(req.body.post)
     // respond to succesful `create` with status 201 and JSON of new "example"
