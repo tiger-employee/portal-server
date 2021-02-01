@@ -30,8 +30,20 @@ const router = express.Router()
 // INDEX
 // GET /examples
 router.get('/posts', (req, res, next) => {
-  console.log(req.query)
-  Post.find({recipient:req.query.user})
+  if (req.query.recipient !== 'all') {
+    Post.find({recipient:req.query.user})
+      .then(posts => {
+        // `examples` will be an array of Mongoose documents
+        // we want to convert each one to a POJO, so we use `.map` to
+        // apply `.toObject` to each one
+        return posts.map(post => post.toObject())
+      })
+      // respond with status 200 and JSON of the examples
+      .then(posts => res.status(200).json({ posts: posts }))
+      // if an error occurs, pass it to the handler
+      .catch(next)
+  } else {
+    Post.find()
     .then(posts => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -42,6 +54,7 @@ router.get('/posts', (req, res, next) => {
     .then(posts => res.status(200).json({ posts: posts }))
     // if an error occurs, pass it to the handler
     .catch(next)
+  }
 })
 
 // SHOW
