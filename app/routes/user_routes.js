@@ -157,4 +157,15 @@ router.delete('/sign-out', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+// INDEX
+// GET /users
+router.get('/users', (req, res, next) => {
+  User.find()
+    .then(users => {
+      return users.map(user => user.toObject())
+    })
+    .then(users => res.status(200).json({ users: users }))
+    .catch(next)
+})
+
 module.exports = router

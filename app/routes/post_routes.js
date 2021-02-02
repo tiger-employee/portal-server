@@ -28,32 +28,23 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
-// GET /examples
 router.get('/posts', (req, res, next) => {
   if (req.query.recipient !== 'all') {
     Post.find({recipient:req.query.user})
+      .populate('owner')
       .then(posts => {
-        // `examples` will be an array of Mongoose documents
-        // we want to convert each one to a POJO, so we use `.map` to
-        // apply `.toObject` to each one
         return posts.map(post => post.toObject())
       })
-      // respond with status 200 and JSON of the examples
       .then(posts => res.status(200).json({ posts: posts }))
-      // if an error occurs, pass it to the handler
       .catch(next)
   } else {
     Post.find()
-    .then(posts => {
-      // `examples` will be an array of Mongoose documents
-      // we want to convert each one to a POJO, so we use `.map` to
-      // apply `.toObject` to each one
-      return posts.map(post => post.toObject())
-    })
-    // respond with status 200 and JSON of the examples
-    .then(posts => res.status(200).json({ posts: posts }))
-    // if an error occurs, pass it to the handler
-    .catch(next)
+      .populate('owner')
+      .then(posts => {
+        return posts.map(post => post.toObject())
+      })
+      .then(posts => res.status(200).json({ posts: posts }))
+      .catch(next)
   }
 })
 
