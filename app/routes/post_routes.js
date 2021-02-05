@@ -29,10 +29,19 @@ const router = express.Router()
 
 // INDEX
 router.get('/posts', (req, res, next) => {
-  if (req.query.recipient !== 'all') {
-    Post.find({recipient:req.query.user})
+  console.log(req.query)
+  if (req.query.recipient !== 'all' && req.query.owner === 'all') {
+    Post.find({recipient:req.query.recipient})
       .populate('owner')
       .then(posts => {
+        return posts.map(post => post.toObject())
+      })
+      .then(posts => res.status(200).json({ posts: posts }))
+      .catch(next)
+  } else if (req.query.recipient === 'all' && req.query.owner !== 'all'){
+    Post.find({owner:req.query.owner})
+      .then(posts => {
+        console.log(posts)
         return posts.map(post => post.toObject())
       })
       .then(posts => res.status(200).json({ posts: posts }))
