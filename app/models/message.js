@@ -9,6 +9,9 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  isImage: {
+    type: Boolean
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
